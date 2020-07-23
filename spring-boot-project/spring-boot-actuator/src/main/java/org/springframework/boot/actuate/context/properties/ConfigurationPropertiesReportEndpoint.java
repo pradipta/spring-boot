@@ -134,6 +134,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 	 * Configure Jackson's {@link ObjectMapper} to be used to serialize the
 	 * {@link ConfigurationProperties @ConfigurationProperties} objects into a {@link Map}
 	 * structure.
+	 *
 	 * @param mapper the object mapper
 	 */
 	protected void configureObjectMapper(ObjectMapper mapper) {
@@ -155,6 +156,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 
 	/**
 	 * Ensure only bindable and non-cyclic bean properties are reported.
+	 *
 	 * @param mapper the object mapper
 	 */
 	private void applySerializationModifier(ObjectMapper mapper) {
@@ -182,17 +184,17 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 	/**
 	 * Cautiously serialize the bean to a map (returning a map with an error message
 	 * instead of throwing an exception if there is a problem).
+	 *
 	 * @param mapper the object mapper
-	 * @param bean the source bean
+	 * @param bean   the source bean
 	 * @param prefix the prefix
 	 * @return the serialized instance
 	 */
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({"unchecked"})
 	private Map<String, Object> safeSerialize(ObjectMapper mapper, Object bean, String prefix) {
 		try {
 			return new HashMap<>(mapper.convertValue(bean, Map.class));
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			return new HashMap<>(Collections.singletonMap("error", "Cannot serialize '" + prefix + "'"));
 		}
 	}
@@ -200,8 +202,9 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 	/**
 	 * Sanitize all unwanted configuration properties to avoid leaking of sensitive
 	 * information.
+	 *
 	 * @param prefix the property prefix
-	 * @param map the source map
+	 * @param map    the source map
 	 * @return the sanitized map
 	 */
 	@SuppressWarnings("unchecked")
@@ -210,11 +213,9 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 			String qualifiedKey = getQualifiedKey(prefix, key);
 			if (value instanceof Map) {
 				map.put(key, sanitize(qualifiedKey, (Map<String, Object>) value));
-			}
-			else if (value instanceof List) {
+			} else if (value instanceof List) {
 				map.put(key, sanitize(qualifiedKey, (List<Object>) value));
-			}
-			else {
+			} else {
 				value = this.sanitizer.sanitize(key, value);
 				value = this.sanitizer.sanitize(qualifiedKey, value);
 				map.put(key, value);
@@ -229,11 +230,9 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 		for (Object item : list) {
 			if (item instanceof Map) {
 				sanitized.add(sanitize(prefix, (Map<String, Object>) item));
-			}
-			else if (item instanceof List) {
+			} else if (item instanceof List) {
 				sanitized.add(sanitize(prefix, (List<Object>) item));
-			}
-			else {
+			} else {
 				sanitized.add(this.sanitizer.sanitize(prefix, item));
 			}
 		}
@@ -247,11 +246,9 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 			String qualifiedKey = getQualifiedKey(prefix, key);
 			if (value instanceof Map) {
 				augmented.put(key, getInputs(qualifiedKey, (Map<String, Object>) value));
-			}
-			else if (value instanceof List) {
+			} else if (value instanceof List) {
 				augmented.put(key, getInputs(qualifiedKey, (List<Object>) value));
-			}
-			else {
+			} else {
 				augmented.put(key, applyInput(qualifiedKey));
 			}
 		});
@@ -266,11 +263,9 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 			String name = prefix + "[" + index++ + "]";
 			if (item instanceof Map) {
 				augmented.add(getInputs(name, (Map<String, Object>) item));
-			}
-			else if (item instanceof List) {
+			} else if (item instanceof List) {
 				augmented.add(getInputs(name, (List<Object>) item));
-			}
-			else {
+			} else {
 				augmented.add(applyInput(name));
 			}
 		}
@@ -350,7 +345,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 
 		@Override
 		public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider,
-				PropertyWriter writer) throws Exception {
+									 PropertyWriter writer) throws Exception {
 			if (writer instanceof BeanPropertyWriter) {
 				try {
 					if (pojo == ((BeanPropertyWriter) writer).get(pojo)) {
@@ -360,8 +355,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 						}
 						return;
 					}
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Skipping '" + writer.getFullName() + "' on '" + pojo.getClass().getName()
 								+ "' as an exception was thrown when retrieving its value", ex);
@@ -381,7 +375,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 
 		@Override
 		public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc,
-				List<BeanPropertyWriter> beanProperties) {
+														 List<BeanPropertyWriter> beanProperties) {
 			List<BeanPropertyWriter> result = new ArrayList<>();
 			Class<?> beanClass = beanDesc.getType().getRawClass();
 			Constructor<?> bindConstructor = findBindConstructor(ClassUtils.getUserClass(beanClass));
@@ -394,14 +388,12 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 		}
 
 		private boolean isCandidate(BeanDescription beanDesc, BeanPropertyWriter writer,
-				Constructor<?> bindConstructor) {
+									Constructor<?> bindConstructor) {
 			if (bindConstructor != null) {
 				return Arrays.stream(bindConstructor.getParameters())
 						.anyMatch((parameter) -> parameter.getName().equals(writer.getName()));
 			}
-			else {
-				return isReadable(beanDesc, writer);
-			}
+			return isReadable(beanDesc, writer);
 		}
 
 		private boolean isReadable(BeanDescription beanDesc, BeanPropertyWriter writer) {
@@ -421,11 +413,11 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 		private AnnotatedMethod findSetter(BeanDescription beanDesc, BeanPropertyWriter writer) {
 			String name = "set" + determineAccessorSuffix(writer.getName());
 			Class<?> type = writer.getType().getRawClass();
-			AnnotatedMethod setter = beanDesc.findMethod(name, new Class<?>[] { type });
+			AnnotatedMethod setter = beanDesc.findMethod(name, new Class<?>[]{type});
 			// The enabled property of endpoints returns a boolean primitive but is set
 			// using a Boolean class
 			if (setter == null && type.equals(Boolean.TYPE)) {
-				setter = beanDesc.findMethod(name, new Class<?>[] { Boolean.class });
+				setter = beanDesc.findMethod(name, new Class<?>[]{Boolean.class});
 			}
 			return setter;
 		}
@@ -434,6 +426,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 		 * Determine the accessor suffix of the specified {@code propertyName}, see
 		 * section 8.8 "Capitalization of inferred names" of the JavaBean specs for more
 		 * details.
+		 *
 		 * @param propertyName the property name to turn into an accessor suffix
 		 * @return the accessor suffix for {@code propertyName}
 		 */
@@ -505,7 +498,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 		private final String parentId;
 
 		private ContextConfigurationProperties(Map<String, ConfigurationPropertiesBeanDescriptor> beans,
-				String parentId) {
+											   String parentId) {
 			this.beans = beans;
 			this.parentId = parentId;
 		}
@@ -533,7 +526,7 @@ public class ConfigurationPropertiesReportEndpoint implements ApplicationContext
 		private final Map<String, Object> inputs;
 
 		private ConfigurationPropertiesBeanDescriptor(String prefix, Map<String, Object> properties,
-				Map<String, Object> inputs) {
+													  Map<String, Object> inputs) {
 			this.prefix = prefix;
 			this.properties = properties;
 			this.inputs = inputs;

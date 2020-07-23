@@ -45,9 +45,9 @@ import org.springframework.util.Assert;
  *
  * @author Phillip Webb
  * @author Madhura Bhave
- * @since 2.0.0
  * @see #of(CharSequence)
  * @see ConfigurationPropertySource
+ * @since 2.0.0
  */
 public final class ConfigurationPropertyName implements Comparable<ConfigurationPropertyName> {
 
@@ -73,6 +73,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Returns {@code true} if this {@link ConfigurationPropertyName} is empty.
+	 *
 	 * @return {@code true} if the name is empty
 	 */
 	public boolean isEmpty() {
@@ -81,6 +82,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return if the last element in the name is indexed.
+	 *
 	 * @return {@code true} if the last element is indexed
 	 */
 	public boolean isLastElementIndexed() {
@@ -90,6 +92,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return if the element in the name is indexed.
+	 *
 	 * @param elementIndex the index of the element
 	 * @return {@code true} if the element is indexed
 	 */
@@ -99,6 +102,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return if the element in the name is indexed and numeric.
+	 *
 	 * @param elementIndex the index of the element
 	 * @return {@code true} if the element is indexed and numeric
 	 */
@@ -108,6 +112,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return the last element in the name in the given form.
+	 *
 	 * @param form the form to return
 	 * @return the last element
 	 */
@@ -118,8 +123,9 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return an element in the name in the given form.
+	 *
 	 * @param elementIndex the element index
-	 * @param form the form to return
+	 * @param form         the form to return
 	 * @return the last element
 	 */
 	public String getElement(int elementIndex, Form form) {
@@ -174,6 +180,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return the total number of elements in the name.
+	 *
 	 * @return the number of elements
 	 */
 	public int getNumberOfElements() {
@@ -182,6 +189,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Create a new {@link ConfigurationPropertyName} by appending the given elements.
+	 *
 	 * @param elements the elements to append
 	 * @return a new {@link ConfigurationPropertyName}
 	 * @throws InvalidConfigurationPropertyNameException if the result is not valid
@@ -197,6 +205,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * Return the parent of this {@link ConfigurationPropertyName} or
 	 * {@link ConfigurationPropertyName#EMPTY} if there is no parent.
+	 *
 	 * @return the parent name
 	 */
 	public ConfigurationPropertyName getParent() {
@@ -208,6 +217,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	 * Return a new {@link ConfigurationPropertyName} by chopping this name to the given
 	 * {@code size}. For example, {@code chop(1)} on the name {@code foo.bar} will return
 	 * {@code foo}.
+	 *
 	 * @param size the size to chop
 	 * @return the chopped name
 	 */
@@ -220,6 +230,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Returns {@code true} if this element is an immediate parent of the specified name.
+	 *
 	 * @param name the name to check
 	 * @return {@code true} if this name is an ancestor
 	 */
@@ -234,6 +245,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * Returns {@code true} if this element is an ancestor (immediate or nested parent) of
 	 * the specified name.
+	 *
 	 * @param name the name to check
 	 * @return {@code true} if this name is an ancestor
 	 */
@@ -265,8 +277,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 				if (result != 0) {
 					return result;
 				}
-			}
-			catch (ArrayIndexOutOfBoundsException ex) {
+			} catch (ArrayIndexOutOfBoundsException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
@@ -326,12 +337,10 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		if (type1.allowsFastEqualityCheck() && type2.allowsFastEqualityCheck()) {
 			return !fastElementEquals(e1, e2, i);
 		}
-		else if (type1.allowsDashIgnoringEqualityCheck() && type2.allowsDashIgnoringEqualityCheck()) {
+		if (type1.allowsDashIgnoringEqualityCheck() && type2.allowsDashIgnoringEqualityCheck()) {
 			return !dashIgnoringElementEquals(e1, e2, i);
 		}
-		else {
-			return !defaultElementEquals(e1, e2, i);
-		}
+		return !defaultElementEquals(e1, e2, i);
 	}
 
 	private boolean fastElementEquals(Elements e1, Elements e2, int i) {
@@ -365,14 +374,11 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 			char ch2 = e2.charAt(i, i2);
 			if (ch1 == '-') {
 				i1++;
-			}
-			else if (ch2 == '-') {
+			} else if (ch2 == '-') {
 				i2++;
-			}
-			else if (ch1 != ch2) {
+			} else if (ch1 != ch2) {
 				return false;
-			}
-			else {
+			} else {
 				i1++;
 				i2++;
 			}
@@ -407,14 +413,11 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 			char ch2 = indexed2 ? e2.charAt(i, i2) : Character.toLowerCase(e2.charAt(i, i2));
 			if (!indexed1 && !ElementsParser.isAlphaNumeric(ch1)) {
 				i1++;
-			}
-			else if (!indexed2 && !ElementsParser.isAlphaNumeric(ch2)) {
+			} else if (!indexed2 && !ElementsParser.isAlphaNumeric(ch2)) {
 				i2++;
-			}
-			else if (ch1 != ch2) {
+			} else if (ch1 != ch2) {
 				return false;
-			}
-			else {
+			} else {
 				i1++;
 				i2++;
 			}
@@ -482,8 +485,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 				result.append('[');
 				result.append(getElement(i, Form.ORIGINAL));
 				result.append(']');
-			}
-			else {
+			} else {
 				result.append(getElement(i, Form.DASHED));
 			}
 		}
@@ -493,6 +495,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * Returns if the given name is valid. If this method returns {@code true} then the
 	 * name may be used with {@link #of(CharSequence)} without throwing an exception.
+	 *
 	 * @param name the name to test
 	 * @return {@code true} if the name is valid
 	 */
@@ -502,6 +505,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return a {@link ConfigurationPropertyName} for the specified string.
+	 *
 	 * @param name the source name
 	 * @return a {@link ConfigurationPropertyName} instance
 	 * @throws InvalidConfigurationPropertyNameException if the name is not valid
@@ -513,6 +517,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * Return a {@link ConfigurationPropertyName} for the specified string or {@code null}
 	 * if the name is not valid.
+	 *
 	 * @param name the source name
 	 * @return a {@link ConfigurationPropertyName} instance
 	 * @since 2.3.1
@@ -523,11 +528,12 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	/**
 	 * Return a {@link ConfigurationPropertyName} for the specified string.
-	 * @param name the source name
+	 *
+	 * @param name                the source name
 	 * @param returnNullIfInvalid if null should be returned if the name is not valid
 	 * @return a {@link ConfigurationPropertyName} instance
 	 * @throws InvalidConfigurationPropertyNameException if the name is not valid and
-	 * {@code returnNullIfInvalid} is {@code false}
+	 *                                                   {@code returnNullIfInvalid} is {@code false}
 	 */
 	static ConfigurationPropertyName of(CharSequence name, boolean returnNullIfInvalid) {
 		Elements elements = elementsOf(name, returnNullIfInvalid);
@@ -582,7 +588,8 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * Create a {@link ConfigurationPropertyName} by adapting the given source. See
 	 * {@link #adapt(CharSequence, char, Function)} for details.
-	 * @param name the name to parse
+	 *
+	 * @param name      the name to parse
 	 * @param separator the separator used to split the name
 	 * @return a {@link ConfigurationPropertyName}
 	 */
@@ -598,13 +605,14 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	 * <p>
 	 * The {@code elementValueProcessor} function may be used if additional processing is
 	 * required on the extracted element values.
-	 * @param name the name to parse
-	 * @param separator the separator used to split the name
+	 *
+	 * @param name                  the name to parse
+	 * @param separator             the separator used to split the name
 	 * @param elementValueProcessor a function to process element values
 	 * @return a {@link ConfigurationPropertyName}
 	 */
 	static ConfigurationPropertyName adapt(CharSequence name, char separator,
-			Function<CharSequence, CharSequence> elementValueProcessor) {
+										   Function<CharSequence, CharSequence> elementValueProcessor) {
 		Assert.notNull(name, "Name must not be null");
 		if (name.length() == 0) {
 			return EMPTY;
@@ -767,6 +775,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		/**
 		 * Returns if the element source can be used as a shortcut for an operation such
 		 * as {@code equals} or {@code toString}.
+		 *
 		 * @param requiredType the required type
 		 * @return {@code true} if all elements match at least one of the types
 		 */
@@ -777,7 +786,8 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		/**
 		 * Returns if the element source can be used as a shortcut for an operation such
 		 * as {@code equals} or {@code toString}.
-		 * @param requiredType the required type
+		 *
+		 * @param requiredType    the required type
 		 * @param alternativeType and alternative required type
 		 * @return {@code true} if all elements match at least one of the types
 		 */
@@ -850,21 +860,18 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 						type = ElementType.NUMERICALLY_INDEXED;
 					}
 					openBracketCount++;
-				}
-				else if (ch == ']') {
+				} else if (ch == ']') {
 					openBracketCount--;
 					if (openBracketCount == 0) {
 						add(start, i, type, valueProcessor);
 						start = i + 1;
 						type = ElementType.EMPTY;
 					}
-				}
-				else if (!type.isIndexed() && ch == this.separator) {
+				} else if (!type.isIndexed() && ch == this.separator) {
 					add(start, i, type, valueProcessor);
 					start = i + 1;
 					type = ElementType.EMPTY;
-				}
-				else {
+				} else {
 					type = updateType(type, ch, i - start);
 				}
 			}
